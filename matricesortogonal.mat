@@ -1,0 +1,44 @@
+https://github.com/jbastianrj/computationalstatistics
+
+function [ Q ] = gen_sparse_rand_orthog_mat( dimension, sparse_density ) 
+%Esta funcion se encuentra disponible en Matlab de manera gratuita y permite la generación
+%de matrices ortogonales, hay que indicar los indicadores y la densidad
+
+% Se pide el tamaño de la matriz y se calcula una matriz ortogonal 
+% aleatoria que incluye muchos ceros y unos.
+N = dimension; 
+num_samples = (sparse_density * N * N)/4; 
+ 
+% Se inicializan los valores de la matriz, se inicializa con una matriz de unos, 
+%puede ser de tamaño pequeño pero depende de N
+
+I = (1:N)'; 
+J = (1:N)'; 
+V = ones(N,1); 
+Q = sparse(I,J,V,N,N); 
+ 
+% Se inicia un ciclo para generación de la matriz aleatoria de tamaño n 
+% Se utiliza una construcción mostrada en lema 17 y 18 usando funciones como c y c* y sigma,
+for k = 1:num_samples 
+    % sample a random angle 
+    theta = rand()*2*pi; 
+ 
+    % sample a random pair of indices 
+    indices = sort(ceil(rand(1,2)*N)); 
+    i = indices(1); 
+    j = indices(2); 
+ 
+    % Se especifican los valores para los inicializadores y los indices para la matriz inicial
+    % que resulta ortogonal desde el principio. 
+    I = [1:(i-1),(i+1):(j-1),(j+1):N, i, i, j, j]'; 
+    J = [1:(i-1),(i+1):(j-1),(j+1):N, i, j, i, j]'; 
+    V = [ones(1,N-2), cos(theta), -sin(theta), sin(theta), cos(theta)]'; 
+	%La matriz inicial V tiene una estuctura como en 3.3, por lo que pertenece al grupo SO(2)
+    Qk = sparse(I,J,V,N,N); 
+ 
+     
+    Q = Qk*Q; %Aquì se actualiza la matriz y permite la construcciòn de forma recursiva.
+end %Fin de for
+ 
+% salir y return para mostrar la matriz
+end %fin de programa
